@@ -11,7 +11,7 @@ timeout: 60s
 concurrency: 50
 
 min-instances: 0
-max-instances: 2
+max-instances: 1
 
 add-cloudsql-instances: PROJECT_ID:REGION:DATABASE_INSTANCE_NAME
 
