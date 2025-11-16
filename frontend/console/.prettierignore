@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+
+# Generated files
+src/__generated__/
+
+# Logs
+*.log
+
+# Environment files
+.env
+.env.*
+
+# Cache
+.cache/
+.vite/

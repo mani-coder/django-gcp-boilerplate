@@ -113,6 +113,7 @@ MIDDLEWARE = [
     "utils.middleware.debug_toolbar.NonHtmlDebugToolbarMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "accounts.middlewares.jwt.JWTMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -272,3 +273,8 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# WorkOS Authentication Settings
+WORKOS_API_KEY = os.environ.get("WORKOS_API_KEY", "")
+WORKOS_CLIENT_ID = os.environ.get("WORKOS_CLIENT_ID", "")
+WORKOS_REDIRECT_URI = os.environ.get("WORKOS_REDIRECT_URI", "http://localhost:8000/auth/callback")

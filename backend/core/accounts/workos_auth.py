@@ -1,10 +1,12 @@
 # Standard Library Imports
-import os
 from functools import wraps
 
 # Third Party Library Imports
 from pydantic import BaseModel
 from workos import WorkOSClient
+
+# Django Imports
+from django.conf import settings
 
 
 _client = None
@@ -14,10 +16,9 @@ def get_workos_client():
     """Get or create WorkOS client instance."""
     global _client
     if not _client:
-        api_key = os.environ.get("WORKOS_API_KEY")
-        if not api_key:
-            raise ValueError("WORKOS_API_KEY environment variable is required")
-        _client = WorkOSClient(api_key=api_key)
+        if not settings.WORKOS_API_KEY:
+            raise ValueError("WORKOS_API_KEY setting is required")
+        _client = WorkOSClient(api_key=settings.WORKOS_API_KEY)
     return _client
 
 
@@ -39,13 +40,12 @@ def workos_call(func):
 
 
 @workos_call
-def authenticate(code: str, client_id: str = None) -> WorkOSUser:
+def authenticate(code: str) -> WorkOSUser:
     """
     Authenticate user with WorkOS authorization code.
 
     Args:
         code: Authorization code from WorkOS OAuth flow
-        client_id: WorkOS client ID (defaults to WORKOS_CLIENT_ID env var)
 
     Returns:
         WorkOSUser object with user information
@@ -55,15 +55,13 @@ def authenticate(code: str, client_id: str = None) -> WorkOSUser:
     """
     client = get_workos_client()
 
-    if not client_id:
-        client_id = os.environ.get("WORKOS_CLIENT_ID")
-        if not client_id:
-            raise ValueError("WORKOS_CLIENT_ID environment variable is required")
+    if not settings.WORKOS_CLIENT_ID:
+        raise ValueError("WORKOS_CLIENT_ID setting is required")
 
     # Exchange authorization code for access token and user profile
     profile_and_token = client.user_management.authenticate_with_code(
         code=code,
-        client_id=client_id,
+        client_id=settings.WORKOS_CLIENT_ID,
     )
 
     user_data = profile_and_token.user
@@ -109,18 +107,16 @@ def verify_session(session_id: str) -> WorkOSUser:
 
 @workos_call
 def get_authorization_url(
-    redirect_uri: str,
+    redirect_uri: str = None,
     state: str = None,
-    client_id: str = None,
     provider: str = None,
 ) -> str:
     """
     Get WorkOS authorization URL for OAuth flow.
 
     Args:
-        redirect_uri: URL to redirect to after authentication
+        redirect_uri: URL to redirect to after authentication (defaults to WORKOS_REDIRECT_URI setting)
         state: Optional state parameter for CSRF protection
-        client_id: WorkOS client ID (defaults to WORKOS_CLIENT_ID env var)
         provider: Optional provider to use (e.g., 'GoogleOAuth', 'MicrosoftOAuth')
 
     Returns:
@@ -128,13 +124,14 @@ def get_authorization_url(
     """
     client = get_workos_client()
 
-    if not client_id:
-        client_id = os.environ.get("WORKOS_CLIENT_ID")
-        if not client_id:
-            raise ValueError("WORKOS_CLIENT_ID environment variable is required")
+    if not settings.WORKOS_CLIENT_ID:
+        raise ValueError("WORKOS_CLIENT_ID setting is required")
+
+    if not redirect_uri:
+        redirect_uri = settings.WORKOS_REDIRECT_URI
 
     params = {
-        "client_id": client_id,
+        "client_id": settings.WORKOS_CLIENT_ID,
         "redirect_uri": redirect_uri,
     }
 

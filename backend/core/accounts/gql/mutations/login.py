@@ -38,11 +38,13 @@ class Login(graphene.Mutation):
 
     class Arguments(object):
         code = graphene.NonNull(graphene.String, description="WorkOS authorization code")
-        client_id = graphene.String(description="WorkOS client ID (optional, uses env var if not provided)")
 
-    def mutate(self, info, code, client_id=None):
+    def mutate(self, info, code):
+        logger.info(f"Login attempt with code: {code[:10]}...")
         try:
-            workos_user = authenticate(code, client_id)
+            workos_user = authenticate(code)
+            logger.info(f"WorkOS authentication successful for user: {workos_user.email}")
+
             if workos_user:
                 user = UserModel.objects.filter(workos_user_id=workos_user.id).first()
                 if not user:
@@ -60,11 +62,12 @@ class Login(graphene.Mutation):
                     user.first_name = workos_user.first_name
                     user.last_name = workos_user.last_name
                     user.save()
+                    logger.info(f"Updated existing user {user.id}")
 
                 login(info.context, user, backend="django.contrib.auth.backends.ModelBackend")
 
                 return Login(response_code=LoginUserResponseCode.LOGIN_SUCCESS, user=user, token=get_token(user))
         except Exception as e:
-            logger.error(f"WorkOS authentication failed: {str(e)}")
+            logger.error(f"WorkOS authentication failed: {str(e)}", exc_info=True)
 
         return Login(response_code=LoginUserResponseCode.INVALID_CODE)
