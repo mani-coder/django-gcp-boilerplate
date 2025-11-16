@@ -1,0 +1,3 @@
+module "queues" {
+  source = "./queues"
+}

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SSE Chat Streamer</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+      }
+      #chat-box {
+        width: 100%;
+        height: 300px;
+        border: 1px solid #ccc;
+        padding: 10px;
+        overflow-y: scroll;
+        background-color: #f9f9f9;
+        margin-bottom: 20px;
+      }
+      #chat-box div {
+        margin-bottom: 10px;
+        padding: 5px;
+        background-color: #e1f5fe;
+        border-radius: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Simple Chat Streamer</h1>
+    <div id="chat-box">
+      <!-- Chat messages will appear here -->
+    </div>
+
+    <p id="status">Connecting to chat stream...</p>
+    <button id="toggleStream">Stop Stream</button>
+
+    <script>
+      const chatBox = document.getElementById("chat-box");
+      const status = document.getElementById("status");
+      const toggleButton = document.getElementById("toggleStream");
+
+      let eventSource = null; // Do not initialize at start
+      let isStreaming = false; // Initially, the stream is not active
+
+      toggleButton.addEventListener("click", function () {
+        if (isStreaming) {
+          eventSource.close(); // Close the current event source
+          eventSource = null;
+          isStreaming = false;
+        } else {
+          eventSource = new EventSource("/api/stream/test/"); // Initialize the event source on button click
+          attachEventHandlers();
+          isStreaming = true;
+        }
+        updateButton();
+      });
+
+      function updateButton() {
+        toggleButton.textContent = isStreaming ? "Stop Stream" : "Start Stream";
+        status.textContent = isStreaming
+          ? "Stream started."
+          : "Stream stopped.";
+      }
+
+      function attachEventHandlers() {
+        eventSource.onmessage = function (event) {
+          const messageDiv = document.createElement("div");
+          messageDiv.textContent = event.data;
+          chatBox.appendChild(messageDiv);
+          chatBox.scrollTop = chatBox.scrollHeight;
+        };
+        eventSource.onerror = function () {
+          status.textContent = "Streaming stopped!";
+          isStreaming = false;
+          eventSource.close();
+          updateButton();
+        };
+        eventSource.onopen = function () {
+          status.textContent = "Connected to chat stream.";
+          isStreaming = true;
+          updateButton();
+        };
+      }
+
+      // Initial button and status update
+      updateButton();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,34 @@
+services:
+  db:
+    container_name: db
+    platform: linux/x86_64
+    image: postgres:16
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=django_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    restart: always
+
+  core:
+    restart: always
+    build:
+      context: ./
+      dockerfile: Dockerfile.dev
+    image: core
+    entrypoint: /usr/src/app/entrypoint-dev.sh
+    command: uvicorn app.asgi:application --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - ./:/usr/src/app/
+      - ./logs:/usr/src/app/logs/
+    ports:
+      - "8000:8000"
+    stdin_open: true
+    tty: true
+    depends_on:
+      - db
+    env_file:
+      - ./.env.dev

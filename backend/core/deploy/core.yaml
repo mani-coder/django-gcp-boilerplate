@@ -1,0 +1,38 @@
+# NOTE: Update these values with your actual GCP project details
+# - Replace PROJECT_ID with your GCP project ID
+# - Replace SERVICE_ACCOUNT_EMAIL with your service account email
+# - Update VPC connector and Cloud SQL instance names as needed
+
+image: REGION-docker.pkg.dev/PROJECT_ID/deploy/core
+service-account: SERVICE_ACCOUNT_EMAIL
+vpc-connector: projects/PROJECT_ID/locations/REGION/connectors/core
+region: REGION
+timeout: 60s
+concurrency: 50
+
+min-instances: 0
+max-instances: 2
+
+add-cloudsql-instances: PROJECT_ID:REGION:DATABASE_INSTANCE_NAME
+
+cpu: 1
+memory: 4G
+
+set-secrets:
+  SECRET_KEY: "SECRET_KEY:latest"
+  OPENAI_API_KEY: "OPENAI_API_KEY:latest"
+  POSTGRES_HOST: "POSTGRES_HOST:latest"
+  POSTGRES_PASSWORD: "POSTGRES_PASSWORD:latest"
+  FIREBASE_AUTH_CREDS_HASH: "FIREBASE_AUTH_CREDS_HASH:latest"
+
+set-env-vars:
+  SERVICE: core
+  ENV: prod
+
+labels:
+  component: backend
+  codebase: core
+  service: core
+
+# Comma seperated
+flags: allow-unauthenticated

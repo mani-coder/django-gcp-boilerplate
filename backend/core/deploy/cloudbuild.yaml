@@ -1,0 +1,27 @@
+# NOTE: Replace PROJECT_ID with your actual GCP project ID
+# Example: sed 's/PROJECT_ID/your-project-123/g' cloudbuild.yaml
+
+steps:
+  - name: "gcr.io/cloud-builders/docker"
+    entrypoint: "bash"
+    args:
+      [
+        "-c",
+        "docker pull ${_REGION}-docker.pkg.dev/${PROJECT_ID}/deploy/core || exit 0",
+      ]
+
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      [
+        "build",
+        "-t",
+        "${_REGION}-docker.pkg.dev/${PROJECT_ID}/deploy/core",
+        "--cache-from",
+        "${_REGION}-docker.pkg.dev/${PROJECT_ID}/deploy/core",
+        ".",
+      ]
+
+images: ["${_REGION}-docker.pkg.dev/${PROJECT_ID}/deploy/core"]
+
+substitutions:
+  _REGION: us-central1
