@@ -1,6 +1,3 @@
-# Third Party Library Imports
-# Django Imports
-# Third Party Library Imports
 from django.contrib.auth.models import AbstractBaseUser
 from django.contrib.auth.models import BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
