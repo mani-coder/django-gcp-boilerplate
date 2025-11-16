@@ -8,16 +8,29 @@ from simple_history.models import HistoricalRecords
 
 
 class UserManager(BaseUserManager):
-    def create_superuser(self, email: str, first_name: str, last_name: str, password: str):
-        user: User = self.model(
-            email=email,
-            password=password,
-            first_name=first_name,
-            last_name=last_name,
-            is_staff=True,
-            is_superuser=True,
-            workos_user_id=email,  # For superuser, use email as placeholder
-        )
+    def create_superuser(self, email, password=None, **extra_fields):
+        """
+        Create and save a superuser with the given email and password.
+        """
+        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_superuser", True)
+        extra_fields.setdefault("is_active", True)
+
+        if not email:
+            raise ValueError("The Email field must be set")
+
+        # Ensure first_name and last_name have defaults
+        if "first_name" not in extra_fields or not extra_fields["first_name"]:
+            extra_fields["first_name"] = "Admin"
+        if "last_name" not in extra_fields or not extra_fields["last_name"]:
+            extra_fields["last_name"] = "User"
+
+        # Use email as workos_user_id placeholder for superusers
+        if "workos_user_id" not in extra_fields:
+            extra_fields["workos_user_id"] = email
+
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
@@ -52,6 +65,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
 
     USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = ["first_name", "last_name"]
 
     def __str__(self):
         return f"{self.id} {self.email}"
