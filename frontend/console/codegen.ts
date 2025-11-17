@@ -13,6 +13,7 @@ const config: CodegenConfig = {
         skipTypename: true,
         skipTypeNameForRoot: true,
         enumsAsTypes: true, // This generates enums as string union types
+        useTypeImports: true, // Use type-only imports for TypeScript
         scalars: {
           JSONString: 'string',
           Date: 'string',

@@ -205,6 +205,7 @@ The console is designed to be deployed as a static site.
 ### Option 1: Google App Engine (Recommended)
 
 **Prerequisites**:
+
 - Google Cloud SDK installed
 - Authenticated: `gcloud auth login`
 - Project set: `gcloud config set project YOUR_PROJECT_ID`
@@ -235,11 +236,13 @@ npm run deploy
 ```
 
 This will:
+
 - Build the app with production environment variables
 - Deploy to Google App Engine as the `console` service
 - Serve at: `https://console-dot-YOUR-PROJECT-ID.uc.r.appspot.com`
 
 **Manual deployment**:
+
 ```bash
 npm run build:prod
 gcloud app deploy app.yaml
@@ -247,6 +250,7 @@ gcloud app deploy app.yaml
 
 **Update `app.yaml` if needed**:
 The `app.yaml` file is pre-configured with:
+
 - Static file serving
 - Client-side routing support (SPA)
 - Cache headers (assets cached for 1 year, HTML no-cache)
