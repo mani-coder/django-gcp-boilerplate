@@ -247,7 +247,7 @@ if not DEBUG or is_true_fn(os.environ.get("USE_GCS")):
                 "GS_LOCATION": "static",
                 "GS_QUERYSTRING_AUTH": False,
                 "GS_DEFAULT_ACL": None,
-                "GS_OBJECT_PARAMETERS": {"cache_control": "public, max-age=28800"},
+                "GS_OBJECT_PARAMETERS": {"cache_control": "public, max-age=86400"},
             },
         },
     }

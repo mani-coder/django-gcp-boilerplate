@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:prod": "tsc -b && vite build --mode production",
     "preview": "vite preview",
+    "deploy": "npm run build:prod && gcloud app deploy app.yaml --quiet",
     "genschema": "graphql-codegen --config codegen-schema.yml && prettier --write src/gql/schema.graphql",
     "gentypes": "graphql-codegen --config codegen.ts",
     "codegen": "npm run genschema && npm run gentypes",

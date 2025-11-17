@@ -200,14 +200,64 @@ All protected routes use the `<ProtectedRoute>` wrapper which checks for authent
 
 ## Deployment
 
-The console is designed to be deployed as a static site. Recommended deployment:
+The console is designed to be deployed as a static site.
 
-### Option 1: Google Cloud Storage (Static Hosting)
+### Option 1: Google App Engine (Recommended)
+
+**Prerequisites**:
+- Google Cloud SDK installed
+- Authenticated: `gcloud auth login`
+- Project set: `gcloud config set project YOUR_PROJECT_ID`
+
+**Setup Production Environment**:
+
+1. Create `.env.production.local` with your production settings:
+
+```bash
+cp .env.production .env.production.local
+
+# Edit .env.production.local with your values:
+VITE_GRAPHQL_URL=https://your-backend-service.run.app/graphql/
+VITE_WORKOS_CLIENT_ID=your_production_workos_client_id
+VITE_WORKOS_REDIRECT_URI=https://console-dot-YOUR-PROJECT-ID.uc.r.appspot.com/auth/callback
+```
+
+**Note**: Replace `YOUR-PROJECT-ID` with your actual GCP project ID.
+
+2. **Configure WorkOS Redirect URI**:
+   - Go to WorkOS Dashboard
+   - Add production redirect URI: `https://console-dot-YOUR-PROJECT-ID.uc.r.appspot.com/auth/callback`
+
+3. **Deploy**:
+
+```bash
+npm run deploy
+```
+
+This will:
+- Build the app with production environment variables
+- Deploy to Google App Engine as the `console` service
+- Serve at: `https://console-dot-YOUR-PROJECT-ID.uc.r.appspot.com`
+
+**Manual deployment**:
+```bash
+npm run build:prod
+gcloud app deploy app.yaml
+```
+
+**Update `app.yaml` if needed**:
+The `app.yaml` file is pre-configured with:
+- Static file serving
+- Client-side routing support (SPA)
+- Cache headers (assets cached for 1 year, HTML no-cache)
+- All favicon files configured
+
+### Option 2: Google Cloud Storage (Static Hosting)
 
 1. Build the app:
 
    ```bash
-   npm run build
+   npm run build:prod
    ```
 
 2. Upload to GCS bucket:
@@ -222,25 +272,21 @@ The console is designed to be deployed as a static site. Recommended deployment:
    gsutil web set -m index.html -e index.html gs://your-bucket-name
    ```
 
-4. Make bucket public (if needed):
+4. Make bucket public:
    ```bash
    gsutil iam ch allUsers:objectViewer gs://your-bucket-name
    ```
 
-### Option 2: Cloud Run (Container)
-
-1. Create a simple nginx Dockerfile to serve static files
-2. Build and deploy to Cloud Run
-
-### Option 3: Any Static Host
+### Option 3: Other Static Hosts
 
 The `dist/` folder can be deployed to:
 
-- Vercel
-- Netlify
-- Cloudflare Pages
-- GitHub Pages
-- etc.
+- **Vercel**: `vercel --prod`
+- **Netlify**: `netlify deploy --prod`
+- **Cloudflare Pages**: via Git integration
+- **GitHub Pages**: via GitHub Actions
+- **AWS S3 + CloudFront**
+- **Azure Static Web Apps**
 
 ## Scripts
 
@@ -250,8 +296,13 @@ The `dist/` folder can be deployed to:
 
 ### Build
 
-- `npm run build` - Build for production
+- `npm run build` - Build for production (development mode)
+- `npm run build:prod` - Build for production with production env vars
 - `npm run preview` - Preview production build
+
+### Deployment
+
+- `npm run deploy` - Build and deploy to Google App Engine
 
 ### GraphQL Code Generation
 

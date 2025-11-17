@@ -16,6 +16,9 @@ dist-ssr
 src/__generated__/
 src/gql/schema.graphql
 
+# Production environment (contains secrets)
+.env.production.local
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

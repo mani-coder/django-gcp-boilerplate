@@ -1,0 +1,72 @@
+runtime: python314
+service: console
+
+handlers:
+  # Main entry point - no cache
+  - url: /
+    static_files: dist/index.html
+    upload: dist/index.html
+    http_headers:
+      Cache-Control: "no-cache"
+
+  # robots.txt - cache for 1 day
+  - url: /robots.txt
+    static_files: dist/robots.txt
+    upload: dist/robots.txt
+    http_headers:
+      Cache-Control: "public, max-age=86400"
+
+  # Favicon files - cache for 1 day
+  - url: /favicon.ico
+    static_files: dist/favicon.ico
+    upload: dist/favicon.ico
+    http_headers:
+      Cache-Control: "public, max-age=86400"
+
+  - url: /favicon-16x16.png
+    static_files: dist/favicon-16x16.png
+    upload: dist/favicon-16x16.png
+    http_headers:
+      Cache-Control: "public, max-age=86400"
+
+  - url: /favicon-32x32.png
+    static_files: dist/favicon-32x32.png
+    upload: dist/favicon-32x32.png
+    http_headers:
+      Cache-Control: "public, max-age=86400"
+
+  - url: /apple-touch-icon.png
+    static_files: dist/apple-touch-icon.png
+    upload: dist/apple-touch-icon.png
+    http_headers:
+      Cache-Control: "public, max-age=86400"
+
+  - url: /android-chrome-192x192.png
+    static_files: dist/android-chrome-192x192.png
+    upload: dist/android-chrome-192x192.png
+    http_headers:
+      Cache-Control: "public, max-age=86400"
+
+  - url: /android-chrome-512x512.png
+    static_files: dist/android-chrome-512x512.png
+    upload: dist/android-chrome-512x512.png
+    http_headers:
+      Cache-Control: "public, max-age=86400"
+
+  # Assets - cache for 1 day
+  - url: /assets/(.*)
+    static_files: dist/assets/\1
+    upload: dist/assets/(.*)
+    http_headers:
+      Cache-Control: "public, max-age=86400"
+
+  # Catch-all for client-side routing - serve index.html
+  - url: /.*
+    static_files: dist/index.html
+    upload: dist/index.html
+    http_headers:
+      Cache-Control: "no-cache"
+
+# Environment variables for production
+env_variables:
+  NODE_ENV: "production"
