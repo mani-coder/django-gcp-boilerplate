@@ -19,21 +19,68 @@ A production-ready Django boilerplate for Google Cloud Platform (GCP) with Cloud
 ## Project Structure
 
 ```
-django-gcp/
+django-gcp-boilerplate/
 ├── backend/
-│   └── core/
+│   └── core/                       # Django backend application
 │       ├── app/                    # Main Django app (settings, URLs, ASGI/WSGI)
-│       ├── accounts/               # User authentication
+│       ├── accounts/               # User authentication & WorkOS integration
+│       │   ├── models.py           # User model with WorkOS integration
+│       │   ├── workos_auth.py      # WorkOS authentication utilities
+│       │   └── gql/                # GraphQL schema (mutations, queries)
 │       ├── deploy/                 # GCP deployment utilities
+│       │   ├── management/         # Custom deploy commands
+│       │   └── terraform/          # Terraform configs for Cloud Tasks
 │       ├── tasks/                  # Cloud Tasks integration
 │       ├── utils/                  # Shared utilities
 │       ├── Dockerfile              # Production Docker image
 │       ├── Dockerfile.dev          # Development Docker image
 │       ├── docker-compose.yml      # Local development with Docker
 │       ├── requirements.txt        # Python dependencies
-│       ├── .env.example            # Environment variables template
+│       ├── dev-requirements.txt    # Development dependencies
+│       ├── .env.dev                # Base env config (committed)
+│       ├── .env.dev.secrets        # Secret overrides (gitignored)
 │       └── manage.py               # Django management script
+│
+├── frontend/
+│   └── console/                    # React admin console (Vite + TypeScript)
+│       ├── src/
+│       │   ├── components/         # React components
+│       │   │   └── ProtectedRoute.tsx
+│       │   ├── pages/              # Page components
+│       │   │   ├── Login.tsx       # WorkOS OAuth login
+│       │   │   ├── AuthCallback.tsx # OAuth callback handler
+│       │   │   └── Dashboard.tsx   # Main dashboard
+│       │   ├── lib/                # Utilities
+│       │   │   ├── graphql-client.ts # urql client setup
+│       │   │   ├── auth.ts         # Auth utilities
+│       │   │   └── utils.ts        # shadcn/ui utilities
+│       │   ├── graphql/            # GraphQL operations
+│       │   │   └── mutations.ts    # Login mutation
+│       │   ├── __generated__/      # Auto-generated types (gitignored)
+│       │   └── gql/                # Downloaded schema (gitignored)
+│       ├── public/                 # Static assets (favicons, etc.)
+│       ├── package.json            # Node dependencies
+│       ├── vite.config.ts          # Vite configuration
+│       ├── tailwind.config.js      # Tailwind CSS config
+│       ├── codegen.ts              # GraphQL codegen config
+│       ├── codegen-schema.yml      # Schema download config
+│       ├── .env                    # Frontend env vars
+│       ├── .nvmrc                  # Node version (24 LTS)
+│       └── README.md               # Frontend documentation
+│
+├── infra/
+│   ├── favicon/                    # App favicon assets
+│   └── README.md                   # Infrastructure documentation
+│
 ├── docs/                           # Documentation
+│   ├── ENVIRONMENT_CONFIG.md       # Environment setup guide
+│   ├── WORKOS_SETUP.md            # WorkOS configuration
+│   ├── DEPLOYMENT.md              # GCP deployment guide
+│   └── GCP_SETUP.md               # GCP initial setup
+│
+├── CLAUDE.md                       # AI-assisted development guide
+├── CONTRIBUTING.md                 # Development workflow
+├── .gitignore                      # Git ignore rules
 └── README.md                       # This file
 ```
 
@@ -106,6 +153,27 @@ python manage.py runserver
 ```
 
 Visit `http://localhost:8000/admin` to access the Django admin panel.
+
+### 5. Run Frontend Console (Optional)
+
+The project includes a React-based admin console for internal staff:
+
+```bash
+cd frontend/console
+
+# Use Node 24 LTS
+nvm use  # Reads from .nvmrc
+
+# Install dependencies
+npm install
+
+# Start dev server
+npm run dev
+```
+
+Visit `http://localhost:3000` to access the admin console.
+
+See [`frontend/console/README.md`](frontend/console/README.md) for detailed frontend documentation.
 
 ## Docker Development
 

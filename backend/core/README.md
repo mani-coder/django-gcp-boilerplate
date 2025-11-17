@@ -51,9 +51,12 @@ python manage.py createsuperuser
 python manage.py runserver
 ```
 
+The server uses **watchfiles** for fast auto-reload when code changes are detected.
+
 Visit:
 - Admin: http://localhost:8000/admin
 - GraphiQL: http://localhost:8000/graphiql/
+- GraphQL API: http://localhost:8000/graphql/
 
 ## Project Structure
 
