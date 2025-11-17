@@ -18,7 +18,12 @@ def get_workos_client():
     if not _client:
         if not settings.WORKOS_API_KEY:
             raise ValueError("WORKOS_API_KEY setting is required")
-        _client = WorkOSClient(api_key=settings.WORKOS_API_KEY)
+        if not settings.WORKOS_CLIENT_ID:
+            raise ValueError("WORKOS_CLIENT_ID setting is required")
+        _client = WorkOSClient(
+            api_key=settings.WORKOS_API_KEY,
+            client_id=settings.WORKOS_CLIENT_ID,
+        )
     return _client
 
 
@@ -55,16 +60,11 @@ def authenticate(code: str) -> WorkOSUser:
     """
     client = get_workos_client()
 
-    if not settings.WORKOS_CLIENT_ID:
-        raise ValueError("WORKOS_CLIENT_ID setting is required")
-
     # Exchange authorization code for access token and user profile
-    profile_and_token = client.user_management.authenticate_with_code(
-        code=code,
-        client_id=settings.WORKOS_CLIENT_ID,
-    )
+    # Note: client_id is configured on the WorkOSClient instance, not passed here
+    auth_response = client.user_management.authenticate_with_code(code=code)
 
-    user_data = profile_and_token.user
+    user_data = auth_response.user
 
     return WorkOSUser(
         id=user_data.id,
